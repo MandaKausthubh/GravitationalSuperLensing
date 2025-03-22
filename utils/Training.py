@@ -4,7 +4,7 @@ from sklearn.metrics import roc_auc_score
 from tqdm import tqdm
 
 
-def Train(model, DataLoader, ValDataLoader, criterion, optimizer, epochs, device, mode="classifier", scheduler=None):
+def Train(model, DataLoader, ValDataLoader, criterion, optimizer, epochs, device, scheduler=None):
     training_losses, training_accuracies = [], []
     training_aucScores = []
     test_losses, test_accuracies = [], []
