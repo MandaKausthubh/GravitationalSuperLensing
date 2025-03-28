@@ -167,6 +167,7 @@ class MaskedAutoEncoder(nn.Module):
                 revert_index: Tensor of shape (B, (H*W)/(p**2))
         """
         assert mode in ["reconstruction", "classification"], "Mode must be either 'reconstruction' or 'classification'"
+        # print(x.shape)
         patches = self.patch_embed_func(x)
         # print(patches.shape, self.pos_embed.shape)
         patches += self.pos_embed[:, 1:, :] * 10 

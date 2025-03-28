@@ -1,26 +1,33 @@
+import numpy as np 
 import torch
 import torch.nn as nn
 
-from MaskedAutoEncoders import MaskedAutoEncoder
+import os, sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
 
-class MAEClassifier(nn.Module):
+from Models.MaskedAutoEncoders import MaskedAutoEncoder
+
+class MAEViTClassifier(nn.Module):
     
-    def __init__(self, Encoder:MaskedAutoEncoder, hidden_size, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, Encoder : MaskedAutoEncoder, num_classes : int, hidden_size=512):
+        super(MAEViTClassifier, self).__init__()
         self.Encoder = Encoder
-        self.num_classes = Encoder.num_classes
-        self.LinearLayer1 = nn.Linear(Encoder.encoder_embed_dim, hidden_size)
-        self.GeLu = nn.GELU()
-        self.LinearLayer2 = nn.Linear(hidden_size, self.num_classes)
+        self.classifier = nn.Sequential(
+            nn.Linear(Encoder.encoder_embed_dim, hidden_size),
+            nn.ReLU(),
+            nn.Linear(hidden_size, hidden_size),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(hidden_size, num_classes)
+        )
         self.Sigmoid = nn.Sigmoid()
         
     def forward(self, x):
-        self.Encoder.eval()
-        with torch.no_grad():
-            embed = self.Encoder.forward_encoder(x, masking_ratio=0, mode="classification")
-            CLS = embed[:, 0, :]
-            y = self.LinearLayer1(CLS)
-            y = self.GeLu(y)
-            y = self.LinearLayer2(y)
-            y = self.Sigmoid(y)
-        return y
+        # print(x.shape)
+        x, _, _ = self.Encoder.forward_encoder(x, masking_ratio=0.0, mode="classification")
+        print(x.shape)
+        x = self.classifier(x[:, :1, :])
+        x = x.squeeze(1)
+        # print(x.shape)
+        return self.Sigmoid(x)
+
