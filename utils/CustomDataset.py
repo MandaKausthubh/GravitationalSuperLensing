@@ -1,7 +1,10 @@
 import torch
 from torch.utils.data import Dataset 
 import numpy as np
-        
+
+
+
+
 class CustomDatasetSelfSupervised(Dataset):
     def __init__(self, root, data, transform=None):
         self.data = data
@@ -16,16 +19,16 @@ class CustomDatasetSelfSupervised(Dataset):
         data = np.load( data_path , allow_pickle=True)
         if self.transform is not None:
             data = self.transform(data)
-        return data
+        return torch.tensor(data, dtype=torch.float32).unsqueeze(0)
 
 
 
-    
+
 def CustomDataset(Dataset):
     
     def __init__(self, root, data, label, label_to_id, transforms=None, label_transform=None):
         self.data, self.label = data, label
-        self.transform = transform
+        self.transform = transforms
         self.label_transform = label_transform
         self.root = root
         self.label_to_id = label_to_id
@@ -37,13 +40,13 @@ def CustomDataset(Dataset):
         data_path = self.root + self.data[idx]  
         label = self.label[idx]
         data = np.load( data_path , allow_pickle=True)
-        if label == "":
+        if label == "axion":
             pass
         if self.transform is not None:
             data = self.transform(data)
         if self.label_transform is not None:
             label = self.label_transform(label)
-        return data, self.label_to_id[label]
+        return torch.tensor(data).unsqueeze(0), self.label_to_id[label]
 
 
 
@@ -51,4 +54,3 @@ def CustomDataset(Dataset):
 
 
 
-        
