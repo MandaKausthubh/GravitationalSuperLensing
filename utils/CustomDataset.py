@@ -1,6 +1,7 @@
 import torch
 from torch.utils.data import Dataset 
 import numpy as np
+import os, sys
 
 
 
@@ -15,7 +16,7 @@ class CustomDatasetSelfSupervised(Dataset):
         return len(self.data)
     
     def __getitem__(self, idx):
-        data_path = self.root + self.data[idx]
+        data_path = os.path.join(self.root, self.data[idx])
         data = np.load( data_path , allow_pickle=True)
         if self.transform is not None:
             data = self.transform(data)
@@ -24,33 +25,54 @@ class CustomDatasetSelfSupervised(Dataset):
 
 
 
-def CustomDataset(Dataset):
-    
+class CustomDataset(Dataset):
     def __init__(self, root, data, label, label_to_id, transforms=None, label_transform=None):
         self.data, self.label = data, label
         self.transform = transforms
         self.label_transform = label_transform
-        self.root = root
+        self.root = os.path.abspath(root)
         self.label_to_id = label_to_id
         
     def __len__(self):
         return len(self.data)
     
     def __getitem__(self, idx):
-        data_path = self.root + self.data[idx]  
-        label = self.label[idx]
-        data = np.load( data_path , allow_pickle=True)
-        if label == "axion":
-            pass
+        data_path = os.path.join(self.root, self.label[idx], self.data[idx])
+        data = torch.tensor(np.load( data_path , allow_pickle=True))
+        if self.label[idx] == "axion":
+            data = data[0]
+        label = self.label_to_id[self.label[idx]]
         if self.transform is not None:
             data = self.transform(data)
-        if self.label_transform is not None:
-            label = self.label_transform(label)
-        return torch.tensor(data).unsqueeze(0), self.label_to_id[label]
+        return torch.tensor(data, dtype=torch.float32), torch.nn.functional.one_hot(torch.tensor(label), num_classes=len(self.label_to_id)).float()
 
 
 
 
+
+
+class CustomSuperResolutionDataset(Dataset):
+
+    def __init__(self, root, data, transform_LR, transform_HR, *args, **kwargs):
+        super(CustomSuperResolutionDataset, self).__init__(*args, **kwargs)
+        self.data = data
+        self.root = root
+        self.transform_LR = transform_LR
+        self.transform_HR = transform_HR
+
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        file_name = self.data[idx]
+        data_HR = np.load( os.path.join(self.root, "HR", file_name) , allow_pickle=True)
+        data_LR = np.load( os.path.join(self.root, "LR", file_name) , allow_pickle=True)
+        if self.transform_LR is not None:
+            data_LR = self.transform_LR(data_LR)
+        if self.transform_HR is not None:
+            data_HR = self.transform_HR(data_HR)
+        return torch.tensor(data_LR, dtype=torch.float32), torch.tensor(data_HR, dtype=torch.float32)
 
 
 

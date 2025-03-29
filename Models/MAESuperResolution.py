@@ -48,11 +48,13 @@ class MAEforSuperResolution(nn.Module):
                 conv = self.conv2
             elif direction == "down":
                 conv = self.conv1
+            else:
+                raise ValueError("Direction must be 'up' or 'down'")
             x = conv(input_tensor)
         else:
             x = input_tensor
 
-        print(f"Reshaping tensor from {x.shape} to {target_shape}")
+        # print(f"Reshaping tensor from {x.shape} to {target_shape}")
         if x.shape[2:] != target_shape[2:]:
             x = F.interpolate(x, size=target_shape[2:], mode=mode)
 
@@ -77,10 +79,11 @@ class MAEforSuperResolution(nn.Module):
                 self.MAE_ViT.H,
                 self.MAE_ViT.W),
             mode='bilinear')
-        print(f"Input tensor shape after downsampling: {x.shape}")
+        # print(f"Input tensor shape after downsampling: {x.shape}")
         _, x, _ = self.MAE_ViT(x, mask_ratio=0.0)
-        x = x.reshape(x.shape[0], self.HR_shape[0], x.shape[1], x.shape[2])
-        print(f"Input tensor shape after MAE: {x.shape}")
+        x = self.MAE_ViT.unpatchify(x)
+        # x = x.reshape(x.shape[0], self.HR_shape[0], x.shape[1], x.shape[2])
+        # print(f"Input tensor shape after MAE: {x.shape}")
         x = self.reshape_tensor(
             x,
             direction="up",
