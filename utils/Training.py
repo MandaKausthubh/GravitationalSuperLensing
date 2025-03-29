@@ -101,20 +101,20 @@ def Train(model, DataLoader, ValDataLoader, criterion, optimizer, epochs, device
 import torch
 from tqdm import tqdm
 
-def Train_MAE(model, train_loader, val_loader, criterion, optimizer, epochs, device, scheduler=None):
+def Train_MAE(model, train_loader, val_loader, criterion, optimizer, epochs, device, masking_ratio=0.75, scheduler=None):
     scaler = torch.cuda.amp.GradScaler()  # Mixed precision scaler
 
     for epoch in range(epochs):
         model.train()
         pbar = tqdm(train_loader, total=len(train_loader), desc=f"Training Epoch {epoch+1}/{epochs}")
 
-        for input, target in pbar:
-            input, target = input.to(device, non_blocking=True), target.to(device, non_blocking=True)
+        for input in pbar:
+            input = input.to(device, non_blocking=True)
 
             optimizer.zero_grad()
             with torch.cuda.amp.autocast():  # Enable mixed precision
-                output = model(input)
-                loss = criterion(output, target)
+                loss, pred, mask = model(input, masking_ratio)
+                loss.backward()
 
             scaler.scale(loss).backward()
             scaler.step(optimizer)
