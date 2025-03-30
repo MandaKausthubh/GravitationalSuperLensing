@@ -43,11 +43,11 @@ def Train(model, DataLoader, ValDataLoader, criterion, optimizer, epochs, device
             input, target = input.to(device, non_blocking=True), target.to(device, non_blocking=True)
 
             optimizer.zero_grad()
-            with torch.cuda.amp.autocast():  # Use mixed precision
+            with torch.amp.autocast('cuda'):  # Use mixed precision
                 output = model(input)
                 loss = criterion(output, target)
 
-            scaler.scale(loss).backward()
+            scaler.scale(loss).backward(retain_graph=False, create_graph=False)
             scaler.step(optimizer)
             scaler.update()
 
@@ -63,7 +63,7 @@ def Train(model, DataLoader, ValDataLoader, criterion, optimizer, epochs, device
         with torch.no_grad():
             for input, target in tqdm(ValDataLoader, desc="Validating"):
                 input, target = input.to(device, non_blocking=True), target.to(device, non_blocking=True)
-                with torch.cuda.amp.autocast():
+                with torch.amp.autocast('cuda'):
                     output = model(input)
                     val_loss += criterion(output, target).detach()
 
@@ -102,7 +102,7 @@ import torch
 from tqdm import tqdm
 
 def Train_MAE(model, train_loader, val_loader, criterion, optimizer, epochs, device, masking_ratio=0.75, scheduler=None):
-    scaler = torch.cuda.amp.GradScaler()  # Mixed precision scaler
+    scaler = torch.amp.GradScaler('cuda')  # Mixed precision scaler
 
     for epoch in range(epochs):
         model.train()
@@ -112,16 +112,16 @@ def Train_MAE(model, train_loader, val_loader, criterion, optimizer, epochs, dev
             input = input.to(device, non_blocking=True)
 
             optimizer.zero_grad()
-            with torch.cuda.amp.autocast():  # Enable mixed precision
+            with torch.amp.autocast('cuda'):  # Enable mixed precision
                 loss, pred, mask = model(input, masking_ratio)
-                loss.backward()
+                # loss.backward()
 
-            scaler.scale(loss).backward()
+            scaler.scale(loss).backward(retain_graph=False, create_graph=False)
             scaler.step(optimizer)
             scaler.update()
 
-            accuracy = (torch.argmax(output, dim=1) == torch.argmax(target, dim=1)).sum().detach() / target.size(0)
-            pbar.set_postfix(loss=loss.item(), accuracy=accuracy.item())
+            # accuracy = (torch.argmax(output, dim=1) == torch.argmax(target, dim=1)).sum().detach() / target.size(0)
+            pbar.set_postfix(loss=loss.item())
 
         if scheduler:
             scheduler.step()
@@ -130,12 +130,11 @@ def Train_MAE(model, train_loader, val_loader, criterion, optimizer, epochs, dev
         model.eval()
         val_loss = 0
         with torch.no_grad():
-            for input, target in tqdm(val_loader, desc="Validating"):
-                input, target = input.to(device, non_blocking=True), target.to(device, non_blocking=True)
-                with torch.cuda.amp.autocast():
-                    output = model(input)
-                    val_loss += criterion(output, target).detach()
-
+            for input in tqdm(val_loader, desc="Validating"):
+                input = input.to(device, non_blocking=True)
+                with torch.amp.autocast('cuda'):
+                    loss, _, _ = model(input)
+                    val_loss = loss.item()
         print(f"Epoch {epoch+1}: Validation Loss = {val_loss / len(val_loader):.4f}")
 
 
@@ -179,7 +178,7 @@ import torch
 from tqdm import tqdm
 
 def Train_SuperResolution(model, train_loader, val_loader, criterion, optimizer, epochs, device, scheduler=None):
-    scaler = torch.cuda.amp.GradScaler()  # Mixed precision scaler
+    scaler = torch.amp.GradScaler('cuda')  # Mixed precision scaler
 
     for epoch in range(epochs):
         model.train()
@@ -189,16 +188,16 @@ def Train_SuperResolution(model, train_loader, val_loader, criterion, optimizer,
             input, target = input.to(device, non_blocking=True), target.to(device, non_blocking=True)
 
             optimizer.zero_grad()
-            with torch.cuda.amp.autocast():  # Enable mixed precision
+            with torch.amp.autocast('cuda'):  # Enable mixed precision
                 output = model(input)
                 loss = criterion(output, target)
 
-            scaler.scale(loss).backward()
+            scaler.scale(loss).backward(retain_graph=False, create_graph=False)
             scaler.step(optimizer)
             scaler.update()
 
             psnr = 10 * torch.log10(1 / loss.detach())  # Compute Peak Signal-to-Noise Ratio (PSNR)
-            pbar.set_postfix(loss=loss.item(), PSNR=psnr.item())
+            pbar.set_postfix(loss=loss.item(), psnr=psnr.item())
 
         if scheduler:
             scheduler.step()
@@ -209,7 +208,7 @@ def Train_SuperResolution(model, train_loader, val_loader, criterion, optimizer,
         with torch.no_grad():
             for input, target in tqdm(val_loader, desc="Validating"):
                 input, target = input.to(device, non_blocking=True), target.to(device, non_blocking=True)
-                with torch.cuda.amp.autocast():
+                with torch.amp.autocast('cuda'):
                     output = model(input)
                     val_loss += criterion(output, target).detach()
 
