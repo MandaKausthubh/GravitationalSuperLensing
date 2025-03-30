@@ -33,7 +33,7 @@ from tqdm import tqdm
 #     print('Finished Training')
 
 def Train(model, DataLoader, ValDataLoader, criterion, optimizer, epochs, device, scheduler=None):
-    scaler = torch.cuda.amp.GradScaler()  # Mixed precision scaler
+    scaler = torch.amp.GradScaler('cuda')  # Mixed precision scaler
 
     for epoch in range(epochs):
         model.train()
