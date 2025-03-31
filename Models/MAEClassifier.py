@@ -25,7 +25,7 @@ class MAEViTClassifier(nn.Module):
     def forward(self, x):
         # print(x.shape)
         x, _, _ = self.Encoder.forward_encoder(x, masking_ratio=0.0, mode="classification")
-        print(x.shape)
+        # print(x.shape)
         x = self.classifier(x[:, :1, :])
         x = x.squeeze(1)
         # print(x.shape)

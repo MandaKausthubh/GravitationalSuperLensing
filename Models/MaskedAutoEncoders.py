@@ -78,7 +78,7 @@ class MaskedAutoEncoder(nn.Module):
         )
 
         # Proper initialization of weights:---------------------------------------
-        nn.init.trunc_normal_(self.pos_embed, std=0.5)
+        # nn.init.trunc_normal_(self.pos_embed, std=0.5)
         # nn.init.trunc_normal_(self.decoder_pos_embed, std=0.2)
         nn.init.trunc_normal_(self.cls_token, std=0.02)
         nn.init.trunc_normal_(self.masking_token, std=0.02)
@@ -170,7 +170,7 @@ class MaskedAutoEncoder(nn.Module):
         # print(x.shape)
         patches = self.patch_embed_func(x)
         # print(patches.shape, self.pos_embed.shape)
-        patches += self.pos_embed[:, 1:, :] * 10 
+        patches += self.pos_embed[:, 1:, :] * 4
         x, revert_index, mask = self.random_masking(patches, masking_ratio)
         if mode == "classification":
             cls_tokens = self.cls_token + (self.pos_embed[:, 0, :]*10)
@@ -213,7 +213,7 @@ class MaskedAutoEncoder(nn.Module):
         else:
             x += self.decoder_pos_embed
         
-        x += self.decoder_pos_embed * 100
+        x += self.decoder_pos_embed * 4
         x = self.decoder_norm(x)
         for block in self.decoder_blocks:
             x = block(x)
@@ -244,7 +244,7 @@ class MaskedAutoEncoder(nn.Module):
         loss = (loss * mask).sum() / (mask.sum() + 1e-8)
         unmasked_loss = (loss * (1-mask)).sum() / ((1-mask).sum() + 1e-8)
 
-        total_loss = 0.6*loss + 0.4*unmasked_loss
+        total_loss = 0.7*loss + 0.3*unmasked_loss
         return total_loss
         
     def forward(self, imgs, mask_ratio=0.75):

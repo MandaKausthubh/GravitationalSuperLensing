@@ -98,8 +98,6 @@ def Train(model, DataLoader, ValDataLoader, criterion, optimizer, epochs, device
 #     print('Finished Training')
 
 
-import torch
-from tqdm import tqdm
 
 def Train_MAE(model, train_loader, val_loader, criterion, optimizer, epochs, device, masking_ratio=0.75, scheduler=None):
     scaler = torch.amp.GradScaler('cuda')  # Mixed precision scaler
@@ -130,12 +128,14 @@ def Train_MAE(model, train_loader, val_loader, criterion, optimizer, epochs, dev
         model.eval()
         val_loss = 0
         with torch.no_grad():
-            for input in tqdm(val_loader, desc="Validating"):
+            pbar = tqdm(val_loader, desc=f"Validating Epoch {epoch+1}/{epochs}")
+            for input in pbar:
                 input = input.to(device, non_blocking=True)
                 with torch.amp.autocast('cuda'):
                     loss, _, _ = model(input)
                     val_loss = loss.item()
-        print(f"Epoch {epoch+1}: Validation Loss = {val_loss / len(val_loader):.4f}")
+                    pbar.set_postfix(loss=val_loss)
+        # print(f"Epoch {epoch+1}: Validation Loss = {val_loss / len(val_loader):.4f}")
 
 
 
@@ -173,9 +173,6 @@ def Train_MAE(model, train_loader, val_loader, criterion, optimizer, epochs, dev
 #     print('Finished Training')
 
 
-
-import torch
-from tqdm import tqdm
 
 def Train_SuperResolution(model, train_loader, val_loader, criterion, optimizer, epochs, device, scheduler=None):
     scaler = torch.amp.GradScaler('cuda')  # Mixed precision scaler
