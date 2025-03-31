@@ -46,8 +46,8 @@ class MaskedAutoEncoder(nn.Module):
         self.encoder_blocks = nn.ModuleList([
             Block(
                 dim=encoder_embedding_dim,
-                num_heads=encoder_num_heads, mlp_ratio=mlp_ratio, proj_drop=0.2,
-                attn_drop=0.2, proj_bias=True, qkv_bias=True, qk_norm=True,
+                num_heads=encoder_num_heads, mlp_ratio=mlp_ratio, proj_drop=0.1,
+                attn_drop=0.1, proj_bias=True, qkv_bias=True, qk_norm=True,
             )
             for _ in range(encoder_depth)
         ])
