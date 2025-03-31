@@ -38,7 +38,7 @@ class CustomDataset(Dataset):
     
     def __getitem__(self, idx):
         data_path = os.path.join(self.root, self.label[idx], self.data[idx])
-        data = torch.tensor(np.load( data_path , allow_pickle=True))
+        data = (np.load( data_path , allow_pickle=True))
         if self.label[idx] == "axion":
             data = data[0]
         label = self.label_to_id[self.label[idx]]
