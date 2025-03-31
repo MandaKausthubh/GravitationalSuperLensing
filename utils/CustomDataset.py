@@ -38,13 +38,14 @@ class CustomDataset(Dataset):
     
     def __getitem__(self, idx):
         data_path = os.path.join(self.root, self.label[idx], self.data[idx])
-        data = (np.load( data_path , allow_pickle=True))
         if self.label[idx] == "axion":
-            data = data[0]
+            data = torch.tensor((np.load( data_path , allow_pickle=True)[0]), dtype=torch.float32)
+        else:
+            data = torch.tensor(np.load( data_path , allow_pickle=True), dtype=torch.float32)
         label = self.label_to_id[self.label[idx]]
         if self.transform is not None:
             data = self.transform(data)
-        return torch.tensor(data, dtype=torch.float32).unsqueeze(0), torch.nn.functional.one_hot(torch.tensor(label), num_classes=len(self.label_to_id)).float()
+        return data.unsqueeze(0), torch.nn.functional.one_hot(torch.tensor(label), num_classes=len(self.label_to_id)).float()
 
 
 
