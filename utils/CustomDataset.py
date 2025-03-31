@@ -17,10 +17,10 @@ class CustomDatasetSelfSupervised(Dataset):
     
     def __getitem__(self, idx):
         data_path = os.path.join(self.root, self.data[idx])
-        data = np.load( data_path , allow_pickle=True)
+        data = torch.tensor(np.load( data_path , allow_pickle=True), dtype=torch.float32).unsqueeze(0)
         if self.transform is not None:
             data = self.transform(data)
-        return torch.tensor(data, dtype=torch.float32).unsqueeze(0)
+        return data
 
 
 
