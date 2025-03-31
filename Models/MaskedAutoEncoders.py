@@ -207,11 +207,11 @@ class MaskedAutoEncoder(nn.Module):
                 revert_indx.unsqueeze(-1).expand(x.shape[0], self.num_patches, x.shape[-1]))
         # x = torch.cat((x[:, :1, :], x_), dim=1)
 
-        if self.training:
-            noise = torch.randn_like(self.decoder_pos_embed) * 0.1
-            x += self.decoder_pos_embed + noise
-        else:
-            x += self.decoder_pos_embed
+        # if self.training:
+        #    noise = torch.randn_like(self.decoder_pos_embed) * 0.1
+        #     x += self.decoder_pos_embed + noise
+        # else:
+        #     x += self.decoder_pos_embed
         
         x += self.decoder_pos_embed * 4
         x = self.decoder_norm(x)
