@@ -36,4 +36,22 @@ The first task is common to all Deep Lense projects and the second one is specif
 
 ### Task 6: Foundational Model with Masked Auto Encoder
 
-We train a [Masked Auto Encoder (MAE)](https://arxiv.org/abs/2111.06377) to over multiple tasks. The data used here can be found 
+We train a [Masked Auto Encoder (MAE)](https://arxiv.org/abs/2111.06377) to over multiple tasks. The data used here can be found in the document again in the Task 6 section. The implementation of the same can be found in `Models/MaskedAutoEncoders.py`, this implementation is inspired from the original implementation by [FAIR's MAE implementation](https://github.com/facebookresearch/mae).
+
+#### Task 6A: Part 1 :- Pretraining
+
+The model is pre-trained on image reconstruction on the dataset `No sub` images which allow to model to learn basic image representations of the image structures. Here we employ certain modifications to enable efficient learning. One major issue I was running into is the low variablility of data, leading the model to overfitting. We deal with this by employing data-augmentation mechanisms by `torchvision.transforms.RandomAffine`, `torchvision.transforms.RandomHorizontalFlip` and `torchvision.transforms.RandomVerticalFlip`. The prevent Overfitting by can be verified by passing an image consisting of pure-noise and seeing that the output is also gives us random representations, which was not as before (which still gives an image representation representing Overfitting and by-hearting image outputs). We also modify the loss function to include a low-weighted unmasked-patch losses.
+
+This achieves the *MSE Loss* of <span style="color:Green">*0.0021*</span>, through a linear scheduler over 500 epochs and 50% masking. We utilize Adam optimizer and weighted MSE Loss. I must note that the image reconstruction has improved with the loss function, however unmasked patches still seem noisy. However we don't sweat over this as further fine tuning tasks seem good.
+
+#### Task 6A: Part 2 :- Fine Tuning for Classification
+
+The implementation can be found in `Models/MAEClassifier.py`. This implementation uses an MLP layer used over the `[CLS]` token passed through the Encoder of MAE. This gives amazing results as shown in the following picture:
+
+![Task6 AUC and ROC](./pictures/Task6AUCandROC.png)
+
+We achieve AUC Score of **<span style="color:Green">1.00, 0.99 and 1.00 </span>** respectively over classes respectively. We achive this by using CrossEntropy with Adam optimizer over 100 epochs.
+
+#### Task 6B:- Super Resolution
+
+This task involves converting low resolution images (75 x 75) to higher resolution images (150 x 150). We use the MAE that has been pre-trained and fine-tuned in task 6a, with a CNN, with linear interpolation based head to convert the (75 x 75) --> (64 x 64) --> (Processed by Encoder + Decoder) --> (150 x 150). This model achieved an *MSE loss* of 0.003, a *PSNR score* of 34.1 and *SSIM* of 0.902. We achieve these results through using Adam optimizer and MSELoss for 100 epochs.
