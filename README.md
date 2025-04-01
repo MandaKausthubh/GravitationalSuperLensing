@@ -2,6 +2,10 @@
 
 I am currently applying the Project :- [Foundation Model for Gravitational Lensing](https://ml4sci.org/gsoc/2025/proposal_DEEPLENSE1.html).
 
+## Setting up the Repo
+
+
+
 ## Structure of Repository
 
 ```bash
