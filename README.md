@@ -2,8 +2,68 @@
 
 I am currently applying the Project :- [Foundation Model for Gravitational Lensing](https://ml4sci.org/gsoc/2025/proposal_DEEPLENSE1.html).
 
+Strong gravitational lensing is a powerful tool for studying dark matter and the large-scale structure of the universe. This project focuses on developing a vision foundation model specifically designed for lensing data, which can be fine-tuned for a variety of downstream tasks, including classification, super-resolution, regression, and lens finding.
+
+This project will explore different training strategies such as self-supervised learning, contrastive learning, or transformer-based models to learn meaningful representations of lensing images. By leveraging diverse datasets and training methodologies, the model will serve as a general-purpose backbone that can adapt to different astrophysical tasks while improving generalization across various observational conditions.
+
+
+
 ## Setting up the Repo
 
+### Setup
+
+#### Cloning the Repository
+
+```bash
+git clone https://github.com/MandaKausthubh/GSOC-25-Projects.git
+cd GSOC-25-Projects
+```
+
+#### Downloading the data
+
+##### Common Task Dataset
+
+```bash
+conda install -c conda-forge gdown
+gdown "https://drive.google.com/uc?id=1ZEyNMEO43u3qhJAwJeBZxFBEYc_pVYZQ"
+unzip -q dataset.zip
+rm -fr dataset.zip __MACOSX
+mkdir dataset/DatasetTask1
+mv dataset/* dataset/DatasetTask1
+```
+
+##### Task 6A dataset
+
+```bash
+conda install -c conda-forge gdown
+gdown "https://drive.google.com/uc?id=1znqUeFzYz-DeAE3dYXD17qoMPK82Whji"
+unzip -q Dataset.zip
+rm -fr Dataset.zip __MACOSX
+mkdir dataset
+mv Dataset dataset/
+mv dataset/Dataset dataset/DatasetTask6A
+mv dataset/
+```
+
+##### Task 6B dataset
+
+```bash
+conda install -c conda-forge gdown
+gdown "https://drive.google.com/uc?id=1uJmDZw649XS-r-dYs9WD-OPwF_TIroVw"
+unzip -q Dataset.zip
+rm -fr Dataset.zip __MACOSX
+mkdir dataset
+mv Dataset dataset/
+mv dataset/Dataset dataset/DatasetTask6B
+mv dataset/
+```
+
+#### Setting up of Environment
+
+```bash
+conda env create -f environment.yml
+conda activate GSOCFoundationalModels
+```
 
 
 ## Structure of Repository
