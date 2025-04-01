@@ -22,7 +22,7 @@ I am currently applying the Project :- [Foundation Model for Gravitational Lensi
     |    |-- DatasetTask6B
 ```
 
-The final submissions are the files Task1Resnet.ipynb and GSOCTasks.ipynb. The model implementaions can be found in the `Models/` folder and the Training and Dataset implementations can be found in the `utils/` folder. **NOTE: The file corresonding to Task6, *GSOCTasks.ipynb*, was made on Google Colab**.
+The final submissions are the files Task1Resnet.ipynb and GSOCTasks.ipynb. The model implementaions can be found in the `Models/` folder and the Training and Dataset implementations can be found in the `utils/` folder. **NOTE: The file corresonding to Task6, *GSOCTasks.ipynb*, was made on Google Colab**. Incase you plan on running it please keep in remove the unnecessary bash commands.
 
 ## Tasks, Models and Results
 
@@ -44,6 +44,8 @@ The model is pre-trained on image reconstruction on the dataset `No sub` images 
 
 This achieves the *MSE Loss* of <span style="color:Green">*0.0021*</span>, through a linear scheduler over 500 epochs and 50% masking. We utilize Adam optimizer and weighted MSE Loss. I must note that the image reconstruction has improved with the loss function, however unmasked patches still seem noisy. However we don't sweat over this as further fine tuning tasks seem good.
 
+![Reconstruction MAE](./pictures/output.png)
+
 #### Task 6A: Part 2 :- Fine Tuning for Classification
 
 The implementation can be found in `Models/MAEClassifier.py`. This implementation uses an MLP layer used over the `[CLS]` token passed through the Encoder of MAE. This gives amazing results as shown in the following picture:
@@ -54,4 +56,10 @@ We achieve AUC Score of **<span style="color:Green">1.00, 0.99 and 1.00 </span>*
 
 #### Task 6B:- Super Resolution
 
-This task involves converting low resolution images (75 x 75) to higher resolution images (150 x 150). We use the MAE that has been pre-trained and fine-tuned in task 6a, with a CNN, with linear interpolation based head to convert the (75 x 75) --> (64 x 64) --> (Processed by Encoder + Decoder) --> (150 x 150). This model achieved an *MSE loss* of 0.003, a *PSNR score* of 34.1 and *SSIM* of 0.902. We achieve these results through using Adam optimizer and MSELoss for 100 epochs.
+This task involves converting low resolution images (75 x 75) to higher resolution images (150 x 150). We use the MAE that has been pre-trained and fine-tuned in task 6a, with a CNN, with linear interpolation based head to convert the (75 x 75) --> (64 x 64) --> (Processed by Encoder + Decoder) --> (150 x 150). This model achieved an *MSE loss* of 0.003, a *PSNR score* of 34.1 and *SSIM* of 0.902. We achieve these results through using Adam optimizer and MSELoss for 100 epochs. The implementation of the same can be found in the file `Models/MAESuperResolution.py`.
+
+![Task6 LR to HR](./pictures/LRtoHR.png)
+
+## Credits and Acknowledgments
+
+- MAE by FAIR: [link](https://github.com/facebookresearch/mae)
