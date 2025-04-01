@@ -1,4 +1,4 @@
-name: ViT
+name: GSOCFoundationalModels
 channels:
   - defaults
   - pytorch
