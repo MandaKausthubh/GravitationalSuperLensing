@@ -14,7 +14,7 @@ This project will explore different training strategies such as self-supervised 
 
 ```bash
 git clone https://github.com/MandaKausthubh/GSOC-25-Projects.git
-cd GSOC-25-Projects
+cd GravitationalSuperLensing
 ```
 
 #### Downloading the data
