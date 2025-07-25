@@ -1,6 +1,4 @@
-# GSOC-2025 Submission - Deep Lense
-
-I am currently applying the Project :- [Foundation Model for Gravitational Lensing](https://ml4sci.org/gsoc/2025/proposal_DEEPLENSE1.html).
+# Gravitational Deep Lense
 
 Strong gravitational lensing is a powerful tool for studying dark matter and the large-scale structure of the universe. This project focuses on developing a vision foundation model specifically designed for lensing data, which can be fine-tuned for a variety of downstream tasks, including classification, super-resolution, regression, and lens finding.
 
